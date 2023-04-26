@@ -44,16 +44,21 @@ def download_clip(url, name, outdir):
         return False
 
 
-def main(list, outdir):
+def main(df, outdir):
 
-    for k, row in enumerate(list):
-        print("{:d} de {:d} - {} - {}".format(k, len(list), row["set_id"], row["ver_id"]))
+    for k, row in df.iterrows():
+        print("{:d} de {:d} - {} - {}".format(k, len(df), row["set_id"], row["ver_id"]))
         if row["status"]:
-            name = "_".join(row["set_id"], row["ver_id"])
+            name = "_".join((str(row["set_id"]), str(row["ver_id"])))
             download_clip(row["url"], name, outdir)
 
 
 if __name__ == "__main__":
+    
+    import pandas as pd
+    
+    df_list = pd.read_csv('list.csv', sep='\t')
+    df_list.columns = ["set_id", "ver_id", "title", "performer", "url", "status"]
 
     outdir = ""
-    main(list, outdir)
+    main(df_list, outdir)
