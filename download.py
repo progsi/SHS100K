@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import youtube_dl
+import yt_dlp
 import os
 
 class MyLogger(object):
@@ -19,22 +19,23 @@ def my_hook(d):
 
 def download_clip(url, name, outdir):
 
-    filename = os.path.join(outdir, name+".wav")
+    filename = os.path.join(outdir, url.split("?v=")[-1]+".mp3")
 
     ydl_opts = {
+        'ffmpeg_location': '../ffmpeg/ffmpeg',
         'format': 'bestaudio/best',
         'outtmpl': filename,
         'noplaylist': True,
         'continue_dl': True,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'wav',
+            'preferredcodec': 'mp3',
             'preferredquality': '192', }],
         'logger': MyLogger(),
         'progress_hooks': [my_hook],
     }
     try:
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.cache.remove()
             info_dict = ydl.extract_info(url, download=False)
             ydl.prepare_filename(info_dict)
@@ -60,5 +61,5 @@ if __name__ == "__main__":
     df_list = pd.read_csv('list.csv', sep='\t')
     df_list.columns = ["set_id", "ver_id", "title", "performer", "url", "status"]
 
-    outdir = ""
+    outdir = "data/"
     main(df_list, outdir)
